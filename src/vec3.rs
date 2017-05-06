@@ -1,6 +1,7 @@
 use std::ops::*;
 use std::fmt;
 
+/* This struct is completly unecessary of course, however following the book here so... */
 #[derive(Copy,Clone)]
 pub struct Vec3 {
   e: [f64; 3]
