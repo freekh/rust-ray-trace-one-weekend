@@ -4,6 +4,19 @@ use vec3::{Vec3, dot};
 mod ray;
 use ray::Ray;
 
+macro_rules! debug {
+  ($($arg:tt)*) => (
+    {
+      use std::io::prelude::*;
+      if let Err(e) = write!(&mut ::std::io::stderr(), "{}\n", format_args!($($arg)*)) {
+        panic!("Failed to write to stderr.\
+                    \nOriginal error output: {}\
+                    \nSecondary error writing to stderr: {}", format!($($arg)*), e);
+      }
+    }
+  )
+}
+
 fn hit_sphere(center: Vec3, radius: f64, r: Ray) -> bool {
   let oc = r.origin() - center;
   let a = dot(r.direction(), r.direction());
@@ -14,7 +27,7 @@ fn hit_sphere(center: Vec3, radius: f64, r: Ray) -> bool {
 }
 
 fn color(r: Ray) -> Vec3 {
-  if (hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r)) {
+  if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r) {
     Vec3::new(1.0, 0.0, 0.0)
   } else {
     let unit_direction = r.direction().unit_vector();
@@ -24,9 +37,13 @@ fn color(r: Ray) -> Vec3 {
   }
 }
 
+
+
 fn main() {
   let nx = 200;
   let ny = 100;
+  
+  debug!("Piping ppm to stdout...");
 
   println!("P3\n{nx} {ny}\n255\n",
            nx = nx,
