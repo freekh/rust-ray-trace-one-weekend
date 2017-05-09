@@ -7,6 +7,12 @@ pub struct Vec3 {
   e: [f64; 3]
 }
 
+pub fn dot(v1: Vec3, v2: Vec3) -> f64 {
+  v1.x() * v2.x() +
+    v1.y() * v2.y() +
+    v1.z() * v2.z()
+}
+
 impl Vec3 {
   pub fn new(e0: f64, e1: f64, e2: f64) -> Vec3 {
     Vec3 {
