@@ -12,12 +12,12 @@ fn color(r: Ray) -> Vec3 {
 }
 
 fn main() {
-  let columns = 200;
-  let rows = 100;
+  let nx = 200;
+  let ny = 100;
 
-  println!("P3\n{columns} {rows}\n255\n",
-           columns = columns,
-           rows = rows);
+  println!("P3\n{nx} {ny}\n255\n",
+           nx = nx,
+           ny = ny);
 
   let lower_left_corner = Vec3::new(
     -2.0, -1.0, -1.0
@@ -33,10 +33,10 @@ fn main() {
   );
 
 
-  for row in 0..rows {
-    for column in (0..columns).rev() {
-      let u = (column as f64) / (columns as f64);
-      let v = (row as f64) / (rows as f64);
+  for y in (0..ny).rev() {
+    for x in 0..nx {
+      let u = (x as f64) / (nx as f64);
+      let v = (y as f64) / (ny as f64);
 
       let r = Ray::new(
         origin, 
