@@ -4,6 +4,9 @@ use vec3::{Vec3, dot};
 mod ray;
 use ray::Ray;
 
+mod shape;
+use shape::Sphere;
+
 macro_rules! debug {
   ($($arg:tt)*) => (
     {
@@ -17,22 +20,8 @@ macro_rules! debug {
   )
 }
 
-fn hit_sphere(center: Vec3, radius: f64, r: Ray) -> f64 {
-  let oc = r.origin() - center;
-  let a = dot(r.direction(), r.direction());
-  let b = 2.0 * dot(oc, r.direction());
-  let c = dot(oc, oc) - radius * radius;
-  let discriminant = b * b - 4.0 * a * c; // "the square part"
-
-  if discriminant < 0.0 {
-    -1.0
-  } else {
-    (-b - discriminant.sqrt()) / (2.0 * a)
-  }
-}
-
 fn color(r: Ray) -> Vec3 {
-  let t = hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r);
+  let t = 0.0; //hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r);
   if t > 0.0 {
     let n = (r.point_at_parameter(t) - 
              Vec3::new(0.0, 0.0, -1.0)).unit_vector();
