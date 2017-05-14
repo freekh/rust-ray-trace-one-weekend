@@ -1,5 +1,7 @@
 extern crate rand;
 
+use std::time::Instant;
+
 mod vec3;
 use vec3::Vec3;
 
@@ -49,6 +51,8 @@ fn color<S>(r: Ray, world: &Shapes<S>) -> Vec3 where S: Shape {
 //
 
 fn main() {
+  let start = Instant::now();
+
   let nx = 200;
   let ny = 100;
   let ns = 100;
@@ -58,7 +62,7 @@ fn main() {
   println!("P3\n{nx} {ny}\n255\n",
            nx = nx,
            ny = ny);
-  
+
   let world = Shapes(vec!(
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
@@ -74,7 +78,6 @@ fn main() {
 
   for y in (0..ny).rev() {
     for x in 0..nx {
-
       let col = 
         (0..ns).fold(Vec3::new(0.0, 0.0, 0.0), |col, _| {
           let u = (x as f64 + rand::random::<f64>()) / (nx as f64);
@@ -86,8 +89,17 @@ fn main() {
       let ir: i32 = (col.r() * 255.99) as i32;
       let ig: i32 = (col.g() * 255.99) as i32;
       let ib: i32 = (col.b() * 255.99) as i32;
+
+      debug!("\r\r\r\r{percent}%", percent = (x + nx * (ny - y - 1)) * 100 / (nx * ny - 1));
+
       println!("{r} {g} {b}", r = ir, g = ig, b = ib);
     }
   }
-  debug!("\r\r\r\rDone!\n")
+
+  let elapsed = start.elapsed();
+  debug!(
+    "\r\r\r\rDone in {seconds}.{fraction}!\n",
+    seconds = elapsed.as_secs(),
+    fraction = elapsed.subsec_nanos()
+  )
 }
