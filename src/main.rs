@@ -6,6 +6,9 @@ use vec3::Vec3;
 mod ray;
 use ray::Ray;
 
+mod camera;
+use camera::Camera;
+
 mod shape;
 use shape::{Sphere, Shape, Shapes};
 
@@ -15,7 +18,7 @@ macro_rules! debug {
   ($($arg:tt)*) => (
     {
       use std::io::prelude::*;
-      if let Err(e) = write!(&mut ::std::io::stderr(), "{}\n", format_args!($($arg)*)) {
+      if let Err(e) = write!(&mut ::std::io::stderr(), "{}", format_args!($($arg)*)) {
         panic!("Failed to write to stderr.\
                     \nOriginal error output: {}\
                     \nSecondary error writing to stderr: {}", format!($($arg)*), e);
@@ -50,24 +53,11 @@ fn main() {
   let ny = 100;
   let ns = 100;
   
-  debug!("Piping ppm to stdout...");
+  debug!("Piping ppm to stdout...\n");
 
   println!("P3\n{nx} {ny}\n255\n",
            nx = nx,
            ny = ny);
-
-  let lower_left_corner = Vec3::new(
-    -2.0, -1.0, -1.0
-  );
-  let horizontal = Vec3::new(
-    4.0, 0.0, 0.0
-  );
-  let vertical = Vec3::new(
-    0.0, 2.0, 0.0
-  );
-  let origin = Vec3::new(
-    0.0, 0.0, 0.0
-  );
   
   let world = Shapes(vec!(
     Sphere::new(
@@ -80,24 +70,18 @@ fn main() {
     )
   ));
 
+  let camera = Camera::new();
+
   for y in (0..ny).rev() {
     for x in 0..nx {
 
-      let mut col = Vec3::new(0.0, 0.0, 0.0);
-      for _ in 0..ns {
-
-        let u = (x as f64 + rand::random::<f64>()) / (nx as f64);
-        let v = (y as f64 + rand::random::<f64>()) / (ny as f64);
-
-        let r = Ray::new(
-          origin, 
-          lower_left_corner + 
-            u * horizontal +
-            v * vertical
-        );
-        col = col + color(r, &world);
-      }
-      col = col / (ns as f64);
+      let col = 
+        (0..ns).fold(Vec3::new(0.0, 0.0, 0.0), |col, _| {
+          let u = (x as f64 + rand::random::<f64>()) / (nx as f64);
+          let v = (y as f64 + rand::random::<f64>()) / (ny as f64);
+          let r = camera.get_ray(u, v);
+          col + color(r, &world)
+        }) / (ns as f64);
       
       let ir: i32 = (col.r() * 255.99) as i32;
       let ig: i32 = (col.g() * 255.99) as i32;
@@ -105,4 +89,5 @@ fn main() {
       println!("{r} {g} {b}", r = ir, g = ig, b = ib);
     }
   }
+  debug!("\r\r\r\rDone!\n")
 }
