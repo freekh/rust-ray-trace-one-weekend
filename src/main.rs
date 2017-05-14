@@ -1,6 +1,11 @@
 extern crate rand;
+use rand::{random, Closed01};
 
+use std::env;
+use std::f64;
 use std::time::Instant;
+
+// 
 
 mod vec3;
 use vec3::Vec3;
@@ -14,8 +19,6 @@ use camera::Camera;
 mod shape;
 use shape::{Sphere, Shape, Shapes};
 
-use std::f64;
-use rand::{random, Closed01};
 
 macro_rules! debug {
   ($($arg:tt)*) => (
@@ -67,7 +70,7 @@ fn main() {
 
   let nx = 200;
   let ny = 100;
-  let ns = 100;
+  let ns = env::args().nth(1).map(|a| a.parse::<i32>().unwrap()).unwrap_or(100);
   
   debug!("Piping ppm to stdout...\n");
 
