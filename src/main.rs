@@ -1,11 +1,14 @@
 mod vec3;
-use vec3::{Vec3, dot};
+use vec3::Vec3;
 
 mod ray;
 use ray::Ray;
 
 mod shape;
-use shape::Sphere;
+use shape::{Sphere, Shape, Shapes};
+
+use std::f64;
+
 
 macro_rules! debug {
   ($($arg:tt)*) => (
@@ -20,17 +23,22 @@ macro_rules! debug {
   )
 }
 
-fn color(r: Ray) -> Vec3 {
-  let t = 0.0; //hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r);
-  if t > 0.0 {
-    let n = (r.point_at_parameter(t) - 
-             Vec3::new(0.0, 0.0, -1.0)).unit_vector();
-    0.5 * Vec3::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0)
-  } else {
-    let unit_direction = r.direction().unit_vector();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) +
-      t*Vec3::new(0.5, 0.7, 1.0)
+fn color<S>(r: Ray, world: &Shapes<S>) -> Vec3 where S: Shape {
+  let maybe_hit = world.hit(r, 0.0, f64::MAX);
+  match maybe_hit {
+    Some(hit) => {
+      0.5 * Vec3::new(
+        hit.normal.x() + 1.0,
+        hit.normal.y() + 1.0,
+        hit.normal.z() + 1.0
+      )
+    }
+    None => {
+      let unit_direction = r.direction().unit_vector();
+      let t = 0.5 * (unit_direction.y() + 1.0);
+      (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) +
+        t*Vec3::new(0.5, 0.7, 1.0)
+    }
   }
 }
 
@@ -58,7 +66,17 @@ fn main() {
   let origin = Vec3::new(
     0.0, 0.0, 0.0
   );
-
+  
+  let world = Shapes(vec!(
+    Sphere::new(
+      Vec3::new(0.0, 0.0, -1.0), 
+      0.5
+    ),
+    Sphere::new(
+      Vec3::new(0.0, -100.5, -1.0), 
+      100.0
+    )
+  ));
 
   for y in (0..ny).rev() {
     for x in 0..nx {
@@ -71,7 +89,7 @@ fn main() {
           u * horizontal +
           v * vertical
       );
-      let col = color(r);
+      let col = color(r, &world);
       
       let ir: i32 = (col.r() * 255.99) as i32;
       let ig: i32 = (col.g() * 255.99) as i32;
