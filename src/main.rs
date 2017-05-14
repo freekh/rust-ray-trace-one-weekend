@@ -1,3 +1,5 @@
+extern crate rand;
+
 mod vec3;
 use vec3::Vec3;
 
@@ -8,7 +10,6 @@ mod shape;
 use shape::{Sphere, Shape, Shapes};
 
 use std::f64;
-
 
 macro_rules! debug {
   ($($arg:tt)*) => (
@@ -47,6 +48,7 @@ fn color<S>(r: Ray, world: &Shapes<S>) -> Vec3 where S: Shape {
 fn main() {
   let nx = 200;
   let ny = 100;
+  let ns = 100;
   
   debug!("Piping ppm to stdout...");
 
@@ -80,16 +82,22 @@ fn main() {
 
   for y in (0..ny).rev() {
     for x in 0..nx {
-      let u = (x as f64) / (nx as f64);
-      let v = (y as f64) / (ny as f64);
 
-      let r = Ray::new(
-        origin, 
-        lower_left_corner + 
-          u * horizontal +
-          v * vertical
-      );
-      let col = color(r, &world);
+      let mut col = Vec3::new(0.0, 0.0, 0.0);
+      for _ in 0..ns {
+
+        let u = (x as f64 + rand::random::<f64>()) / (nx as f64);
+        let v = (y as f64 + rand::random::<f64>()) / (ny as f64);
+
+        let r = Ray::new(
+          origin, 
+          lower_left_corner + 
+            u * horizontal +
+            v * vertical
+        );
+        col = col + color(r, &world);
+      }
+      col = col / (ns as f64);
       
       let ir: i32 = (col.r() * 255.99) as i32;
       let ig: i32 = (col.g() * 255.99) as i32;
