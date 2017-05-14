@@ -3,7 +3,7 @@ use ray::Ray;
 
 pub struct HitRecord {
   pub t: f64,
-  pub p: Vec3,
+  pub point: Vec3,
   pub normal: Vec3
 }
 
@@ -40,17 +40,16 @@ impl Shape for Sphere {
         let p = ray.point_at_parameter(temp);
         Some(HitRecord {
           t: temp,
-          p: p,
+          point: p,
           normal: (p - self.center) / self.radius
         })
       } else {
-
         let temp = (-b + discriminant.sqrt()) / (2.0 * a);
         if temp > t_min && temp < t_max {
           let p = ray.point_at_parameter(temp);
           Some(HitRecord {
             t: temp,
-            p: p,
+            point: p,
             normal: (p - self.center) / self.radius
           })
         } else {
