@@ -15,6 +15,7 @@ mod shape;
 use shape::{Sphere, Shape, Shapes};
 
 use std::f64;
+use rand::{random, Rng, Closed01};
 
 macro_rules! debug {
   ($($arg:tt)*) => (
@@ -32,10 +33,11 @@ macro_rules! debug {
 fn random_in_unit_sphere() -> Vec3 {
   let mut p: Vec3;
   while {
+    let Closed01(xRand) = random::<Closed01<f64>>();
+    let Closed01(yRand) = random::<Closed01<f64>>();
+    let Closed01(zRand) = random::<Closed01<f64>>();
     p = 2.0 * Vec3::new(
-      rand::random::<f64>(),
-      rand::random::<f64>(),
-      rand::random::<f64>()
+      xRand, yRand, zRand
     ) - Vec3::new(1.0, 1.0, 1.0);
     p.squared_length() >= 1.0
   } {}
@@ -47,7 +49,7 @@ fn color<S>(r: Ray, world: &Shapes<S>) -> Vec3 where S: Shape {
   match maybe_hit {
     Some(hit) => {
       let target = hit.point + hit.normal + random_in_unit_sphere();
-      0.5 * color( Ray::new(hit.point, target - hit.point), world)
+      0.5 * color(Ray::new(hit.point, target - hit.point), world)
     }
     None => {
       let unit_direction = r.direction().unit_vector();
@@ -90,8 +92,10 @@ fn main() {
     for x in 0..nx {
       let col = 
         (0..ns).fold(Vec3::new(0.0, 0.0, 0.0), |col, _| {
-          let u = (x as f64 + rand::random::<f64>()) / (nx as f64);
-          let v = (y as f64 + rand::random::<f64>()) / (ny as f64);
+          let Closed01(uRand) = random::<Closed01<f64>>();
+          let Closed01(vRand) = random::<Closed01<f64>>();
+          let u = (x as f64 + uRand) / (nx as f64);
+          let v = (y as f64 + vRand) / (ny as f64);
           let r = camera.get_ray(u, v);
           col + color(r, &world)
         }) / (ns as f64);
