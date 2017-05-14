@@ -29,15 +29,25 @@ macro_rules! debug {
   )
 }
 
+fn random_in_unit_sphere() -> Vec3 {
+  let mut p: Vec3;
+  while {
+    p = 2.0 * Vec3::new(
+      rand::random::<f64>(),
+      rand::random::<f64>(),
+      rand::random::<f64>()
+    ) - Vec3::new(1.0, 1.0, 1.0);
+    p.squared_length() >= 1.0
+  } {}
+  p
+}
+
 fn color<S>(r: Ray, world: &Shapes<S>) -> Vec3 where S: Shape {
   let maybe_hit = world.hit(r, 0.0, f64::MAX);
   match maybe_hit {
     Some(hit) => {
-      0.5 * Vec3::new(
-        hit.normal.x() + 1.0,
-        hit.normal.y() + 1.0,
-        hit.normal.z() + 1.0
-      )
+      let target = hit.point + hit.normal + random_in_unit_sphere();
+      0.5 * color( Ray::new(hit.point, target - hit.point), world)
     }
     None => {
       let unit_direction = r.direction().unit_vector();
