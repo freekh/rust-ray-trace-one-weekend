@@ -15,7 +15,7 @@ mod shape;
 use shape::{Sphere, Shape, Shapes};
 
 use std::f64;
-use rand::{random, Rng, Closed01};
+use rand::{random, Closed01};
 
 macro_rules! debug {
   ($($arg:tt)*) => (
@@ -33,11 +33,11 @@ macro_rules! debug {
 fn random_in_unit_sphere() -> Vec3 {
   let mut p: Vec3;
   while {
-    let Closed01(xRand) = random::<Closed01<f64>>();
-    let Closed01(yRand) = random::<Closed01<f64>>();
-    let Closed01(zRand) = random::<Closed01<f64>>();
+    let Closed01(x_rand) = random::<Closed01<f64>>();
+    let Closed01(y_rand) = random::<Closed01<f64>>();
+    let Closed01(z_rand) = random::<Closed01<f64>>();
     p = 2.0 * Vec3::new(
-      xRand, yRand, zRand
+      x_rand, y_rand, z_rand
     ) - Vec3::new(1.0, 1.0, 1.0);
     p.squared_length() >= 1.0
   } {}
@@ -45,7 +45,7 @@ fn random_in_unit_sphere() -> Vec3 {
 }
 
 fn color<S>(r: Ray, world: &Shapes<S>) -> Vec3 where S: Shape {
-  let maybe_hit = world.hit(r, 0.0, f64::MAX);
+  let maybe_hit = world.hit(r, 0.001, f64::MAX);
   match maybe_hit {
     Some(hit) => {
       let target = hit.point + hit.normal + random_in_unit_sphere();
@@ -92,17 +92,22 @@ fn main() {
     for x in 0..nx {
       let col = 
         (0..ns).fold(Vec3::new(0.0, 0.0, 0.0), |col, _| {
-          let Closed01(uRand) = random::<Closed01<f64>>();
-          let Closed01(vRand) = random::<Closed01<f64>>();
-          let u = (x as f64 + uRand) / (nx as f64);
-          let v = (y as f64 + vRand) / (ny as f64);
+          let Closed01(u_rand) = random::<Closed01<f64>>();
+          let Closed01(v_rand) = random::<Closed01<f64>>();
+          let u = (x as f64 + u_rand) / (nx as f64);
+          let v = (y as f64 + v_rand) / (ny as f64);
           let r = camera.get_ray(u, v);
           col + color(r, &world)
         }) / (ns as f64);
+      let gamma_corrected = Vec3::new(
+        col.r().sqrt(),
+        col.g().sqrt(),
+        col.b().sqrt()
+      );
       
-      let ir: i32 = (col.r() * 255.99) as i32;
-      let ig: i32 = (col.g() * 255.99) as i32;
-      let ib: i32 = (col.b() * 255.99) as i32;
+      let ir: i32 = (gamma_corrected.r() * 255.99) as i32;
+      let ig: i32 = (gamma_corrected.g() * 255.99) as i32;
+      let ib: i32 = (gamma_corrected.b() * 255.99) as i32;
 
       debug!("\r\r\r\r{percent}%", percent = (x + nx * (ny - y - 1)) * 100 / (nx * ny - 1));
 
