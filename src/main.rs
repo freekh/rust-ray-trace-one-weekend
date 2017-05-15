@@ -17,7 +17,7 @@ use vec3::Vec3;
 use ray::Ray;
 use camera::Camera;
 use shape::{Sphere, Shape, Shapes};
-use material::{Material, Lambertian};
+use material::Lambertian;
 
 //
 
