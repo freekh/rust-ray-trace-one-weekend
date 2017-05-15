@@ -1,33 +1,41 @@
 use vec3::{Vec3, dot};
 use ray::Ray;
+use material::Material;
 
-pub struct HitRecord {
+pub struct HitRecord<M> where M: Material + Sized {
   pub t: f64,
   pub point: Vec3,
-  pub normal: Vec3
+  pub normal: Vec3,
+  pub material: M
 }
 
 pub trait Shape { // hitable sucks as name, shape is better...
-  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+  type M: Material;
+  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord<Self::M>>;
 }
 
 
-pub struct Sphere {
+pub struct Sphere<Mat> where Mat: Material {
   center: Vec3,
-  radius: f64
+  radius: f64,
+  material: Mat
 }
 
-impl Sphere {
-  pub fn new(center: Vec3, radius: f64) -> Sphere {
+impl<Mat> Sphere<Mat> where Mat: Material  {
+  pub fn new(center: Vec3, radius: f64, material: Mat) -> Sphere<Mat> {
     Sphere {
       center: center,
-      radius: radius
+      radius: radius,
+      material: material
     }
   }
 }
 
-impl Shape for Sphere {
-  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+impl<Mat> Shape for Sphere<Mat> where Mat: Material {
+  type M = Mat;
+
+
+  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord<Self::M>> {
     let oc = ray.origin() - self.center;
     let a = dot(ray.direction(), ray.direction());
     let b = 2.0 * dot(oc, ray.direction());
@@ -41,7 +49,8 @@ impl Shape for Sphere {
         Some(HitRecord {
           t: temp,
           point: p,
-          normal: (p - self.center) / self.radius
+          normal: (p - self.center) / self.radius,
+          material: self.material
         })
       } else {
         let temp = (-b + discriminant.sqrt()) / (2.0 * a);
@@ -50,7 +59,8 @@ impl Shape for Sphere {
           Some(HitRecord {
             t: temp,
             point: p,
-            normal: (p - self.center) / self.radius
+            normal: (p - self.center) / self.radius,
+            material: self.material
           })
         } else {
           None
@@ -65,7 +75,9 @@ impl Shape for Sphere {
 pub struct Shapes<S>(pub Vec<S>) where S : Shape + Sized;
 
 impl<S> Shape for Shapes<S> where S : Shape + Sized {
-  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+  type M = S::M;
+
+  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord<Self::M>> {
     let &Shapes(ref inner) = self;
     inner
       .iter()

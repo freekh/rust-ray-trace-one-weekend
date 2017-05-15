@@ -8,17 +8,18 @@ use std::time::Instant;
 // 
 
 mod vec3;
-use vec3::Vec3;
-
 mod ray;
-use ray::Ray;
-
 mod camera;
-use camera::Camera;
-
 mod shape;
-use shape::{Sphere, Shape, Shapes};
+mod material;
 
+use vec3::Vec3;
+use ray::Ray;
+use camera::Camera;
+use shape::{Sphere, Shape, Shapes};
+use material::{Material, Lambertian};
+
+//
 
 macro_rules! debug {
   ($($arg:tt)*) => (
@@ -81,11 +82,13 @@ fn main() {
   let world = Shapes(vec!(
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
-      0.5
+      0.5,
+      Lambertian { albedo : Vec3::new(0.0, 0.0, 0.0) }
     ),
     Sphere::new(
       Vec3::new(0.0, -100.5, -1.0), 
-      100.0
+      100.0,
+      Lambertian { albedo : Vec3::new(0.0, 0.0, 0.0) }
     )
   ));
 
