@@ -15,13 +15,13 @@ pub trait Shape { // hitable sucks as name, shape is better...
 }
 
 
-pub struct Sphere<Mat> {
+pub struct Sphere<Mat> where Mat: Material {
   center: Vec3,
   radius: f64,
-  material: Material
+  material: Mat
 }
 
-impl<Mat> Sphere<Mat> where Mat: Material  {
+impl<Mat> Sphere<Mat> where Mat: Material {
   pub fn new(center: Vec3, radius: f64, material: Mat) -> Sphere<Mat> {
     Sphere {
       center: center,
@@ -31,8 +31,8 @@ impl<Mat> Sphere<Mat> where Mat: Material  {
   }
 }
 
-impl<Mat> Shape for Sphere<Mat> where Mat: Material {
-  type M = Material;
+impl<Mat> Shape for Sphere<Mat> where Mat: Material  {
+  type M = Mat;
 
   fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord<Self::M>> {
     let oc = ray.origin() - self.center;
