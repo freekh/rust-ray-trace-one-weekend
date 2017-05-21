@@ -34,26 +34,17 @@ macro_rules! debug {
   )
 }
 
-fn random_in_unit_sphere() -> Vec3 {
-  let mut p: Vec3;
-  while {
-    let Closed01(x_rand) = random::<Closed01<f64>>();
-    let Closed01(y_rand) = random::<Closed01<f64>>();
-    let Closed01(z_rand) = random::<Closed01<f64>>();
-    p = 2.0 * Vec3::new(
-      x_rand, y_rand, z_rand
-    ) - Vec3::new(1.0, 1.0, 1.0);
-    p.squared_length() >= 1.0
-  } {}
-  p
-}
-
-fn color<S>(r: Ray, world: &Shapes<S>) -> Vec3 where S: Shape {
+fn color<S>(r: Ray, world: &Shapes<S>, depth: i32) -> Vec3 where S: Shape {
   let maybe_hit = world.hit(r, 0.001, f64::MAX);
   match maybe_hit {
     Some(hit) => {
-      let target = hit.point + hit.normal + random_in_unit_sphere();
-      0.5 * color(Ray::new(hit.point, target - hit.point), world)
+      if depth >= 50 { // TODO: not ideal, but could not see how to use && with if let
+        Vec3::new(0.0, 0.0, 0.0) 
+      } else if let Some((attunation, scattered)) = hit.material.scatter(r, hit) {
+        attunation * color(scattered, world, depth + 1)
+      } else {
+        Vec3::new(0.0, 0.0, 0.0) 
+      }
     }
     None => {
       let unit_direction = r.direction().unit_vector();
@@ -83,12 +74,12 @@ fn main() {
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
       0.5,
-      Lambertian { albedo : Vec3::new(0.0, 0.0, 0.0) }
+      Lambertian::new(Vec3::new(0.0, 0.0, 0.0))
     ),
     Sphere::new(
       Vec3::new(0.0, -100.5, -1.0), 
       100.0,
-      Lambertian { albedo : Vec3::new(0.0, 0.0, 0.0) }
+      Lambertian::new(Vec3::new(0.0, 0.0, 0.0))
     )
   ));
 
@@ -103,7 +94,7 @@ fn main() {
           let u = (x as f64 + u_rand) / (nx as f64);
           let v = (y as f64 + v_rand) / (ny as f64);
           let r = camera.get_ray(u, v);
-          col + color(r, &world)
+          col + color(r, &world, 0)
         }) / (ns as f64);
       let gamma_corrected = Vec3::new(
         col.r().sqrt(),
