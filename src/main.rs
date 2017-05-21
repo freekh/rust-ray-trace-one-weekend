@@ -17,7 +17,7 @@ use vec3::Vec3;
 use ray::Ray;
 use camera::Camera;
 use shape::{Sphere, Shape, Shapes};
-use material::Lambertian;
+use material::*;
 
 //
 
@@ -40,7 +40,7 @@ fn color<S>(r: Ray, world: &Shapes<S>, depth: i32) -> Vec3 where S: Shape {
     Some(hit) => {
       if depth >= 50 { // TODO: not ideal, but could not see how to use && with if let
         Vec3::new(0.0, 0.0, 0.0) 
-      } else if let Some((attunation, scattered)) = hit.material.scatter(r, hit) {
+      } else if let Some((attunation, scattered)) = hit.material.scatter(r, &hit) {
         attunation * color(scattered, world, depth + 1)
       } else {
         Vec3::new(0.0, 0.0, 0.0) 
@@ -74,13 +74,24 @@ fn main() {
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
       0.5,
-      Lambertian::new(Vec3::new(0.0, 0.0, 0.0))
+      Lambertian::new(Vec3::new(0.8, 0.3, 0.3))
     ),
     Sphere::new(
       Vec3::new(0.0, -100.5, -1.0), 
       100.0,
-      Lambertian::new(Vec3::new(0.0, 0.0, 0.0))
+      Lambertian::new(Vec3::new(0.8, 0.8, 0.0))
     )
+    //   ,
+    // Sphere::new(
+    //   Vec3::new(1.0, 0.0, -1.0), 
+    //   0.5,
+    //   Metal::new(Vec3::new(0.8, 0.6, 0.2))
+    // ),
+    // Sphere::new(
+    //   Vec3::new(-1.0, 0.0, -1.0), 
+    //   0.5,
+    //   Metal::new(Vec3::new(0.8, 0.8, 0.8))
+    // )
   ));
 
   let camera = Camera::new();
