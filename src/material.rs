@@ -3,7 +3,6 @@ use rand::{random, Closed01};
 use vec3::{dot, Vec3};
 use ray::Ray;
 use shape::HitRecord;
-use std::f64::{NAN};
 
 pub trait Material{
   fn scatter(&self, r_in: Ray, rec: &HitRecord) -> Option<(Vec3, Ray)>;
@@ -105,7 +104,7 @@ impl Material for Dielectric {
     let outward_normal: Vec3;
     let ni_over_t: f64;
     let cosine: f64;
-    if dot(r_in.direction(), rec.normal) > 0.0 {
+    if dot(r_in.direction(), rec.normal) > 0.00001 {
       outward_normal = -rec.normal;
       ni_over_t = self.ref_idx;
       cosine = self.ref_idx * dot(r_in.direction(), rec.normal) / r_in.direction().length();
@@ -117,13 +116,13 @@ impl Material for Dielectric {
     
     match refract(r_in.direction(), outward_normal, ni_over_t) {
       Some(refracted) => {
-        let reflect_prob = schlick(cosine, self.ref_idx);
-        let Closed01(rand) = random::<Closed01<f64>>();
-        if rand < 1.0 && rand < reflect_prob {
-          Some((attunation, Ray::new(rec.point, reflected)))
-        } else {
+        //let reflect_prob = schlick(cosine, self.ref_idx);
+        //let Closed01(rand) = random::<Closed01<f64>>();
+        //if rand < 1.0 && rand < reflect_prob {
+          //Some((attunation, Ray::new(rec.point, refracted)))
+        //} else {
           Some((attunation, Ray::new(rec.point, refracted)))
-        }
+        //}
       }
       None => {
         Some((attunation, Ray::new(rec.point, reflected)))
