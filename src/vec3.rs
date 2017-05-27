@@ -170,6 +170,20 @@ impl Div<f64> for Vec3 {
   }
 }
 
+impl Neg for Vec3 {
+  type Output = Vec3;
+  
+  fn neg(self) -> Vec3 {
+    Vec3 {
+      e: [
+        -self.e[0],
+        -self.e[1],
+        -self.e[2]
+      ]
+    }
+  }
+}
+
 impl fmt::Display for Vec3 {
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

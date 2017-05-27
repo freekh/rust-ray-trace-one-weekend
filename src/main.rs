@@ -20,7 +20,6 @@ use shape::{Sphere, Shape, Shapes};
 use material::*;
 
 //
-
 macro_rules! debug {
   ($($arg:tt)*) => (
     {
@@ -69,10 +68,10 @@ fn main() {
   println!("P3\n{nx} {ny}\n255\n",
            nx = nx,
            ny = ny);
-  let m1 = &Lambertian::new(Vec3::new(0.8, 0.3, 0.3));
+  let m1 = &Lambertian::new(Vec3::new(0.1, 0.2, 0.5));
   let m2 = &Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
   let m3 = &Metal::new(Vec3::new(0.8, 0.6, 0.2));
-  let m4 = &Metal::new(Vec3::new(0.8, 0.8, 0.8));
+  let m4 = &Dielectric::new(1.5);
   let world = Shapes(vec!(
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
@@ -92,6 +91,11 @@ fn main() {
     Sphere::new(
       Vec3::new(-1.0, 0.0, -1.0), 
       0.5,
+      m4
+    ),
+    Sphere::new(
+      Vec3::new(-1.0, 0.0, -1.0), 
+      -0.45,
       m4
     )
   ));
