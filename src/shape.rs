@@ -2,27 +2,25 @@ use vec3::{Vec3, dot};
 use ray::Ray;
 use material::Material;
 
-pub struct HitRecord<M> where M: Material + Sized {
+pub struct HitRecord {
   pub t: f64,
   pub point: Vec3,
   pub normal: Vec3,
-  pub material: M
+  pub material: Box<Material>
 }
 
-pub trait Shape { // hitable sucks as name, shape is better...
-  type M: Material;
-  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord<Self::M>>;
+pub trait Shape: Sized { // hitable sucks as name, shape is better...
+  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-
-pub struct Sphere<Mat> where Mat: Material {
+pub struct Sphere {
   center: Vec3,
   radius: f64,
-  material: Mat
+  material: Box<Material>
 }
 
-impl<Mat> Sphere<Mat> where Mat: Material {
-  pub fn new(center: Vec3, radius: f64, material: Mat) -> Sphere<Mat> {
+impl Sphere {
+  pub fn new(center: Vec3, radius: f64, material: Box<Material>) -> Sphere {
     Sphere {
       center: center,
       radius: radius,
@@ -31,10 +29,8 @@ impl<Mat> Sphere<Mat> where Mat: Material {
   }
 }
 
-impl<Mat> Shape for Sphere<Mat> where Mat: Material  {
-  type M = Mat;
-
-  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord<Self::M>> {
+impl Shape for Sphere {
+  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
     let oc = ray.origin() - self.center;
     let a = dot(ray.direction(), ray.direction());
     let b = 2.0 * dot(oc, ray.direction());
@@ -71,12 +67,10 @@ impl<Mat> Shape for Sphere<Mat> where Mat: Material  {
   }
 }
 
-pub struct Shapes<S>(pub Vec<S>) where S : Shape + Sized;
+pub struct Shapes<S>(pub Vec<S>) where S: Shape + Sized;
 
-impl<S> Shape for Shapes<S> where S : Shape + Sized {
-  type M = S::M;
-
-  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord<Self::M>> {
+impl<S> Shape for Shapes<S> where S: Shape + Sized {
+  fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
     let &Shapes(ref inner) = self;
     inner
       .iter()

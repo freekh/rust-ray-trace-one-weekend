@@ -34,7 +34,7 @@ macro_rules! debug {
   )
 }
 
-fn color<S>(r: Ray, world: &Shapes<S>, depth: i32) -> Vec3 where S: Shape {
+fn color<S>(r: Ray, world: &Shapes<S>, depth: i32) -> Vec3 where S: Shape + Sized{
   let maybe_hit = world.hit(r, 0.001, f64::MAX);
   match maybe_hit {
     Some(hit) => {
@@ -74,24 +74,23 @@ fn main() {
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
       0.5,
-      Lambertian::new(Vec3::new(0.8, 0.3, 0.3))
+      Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3)))
     ),
     Sphere::new(
       Vec3::new(0.0, -100.5, -1.0), 
       100.0,
-      Lambertian::new(Vec3::new(0.8, 0.8, 0.0))
+      Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)))
+    ),
+    Sphere::new(
+      Vec3::new(1.0, 0.0, -1.0), 
+      0.5,
+      Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2)))
+    ),
+    Sphere::new(
+      Vec3::new(-1.0, 0.0, -1.0), 
+      0.5,
+      Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8)))
     )
-    //   ,
-    // Sphere::new(
-    //   Vec3::new(1.0, 0.0, -1.0), 
-    //   0.5,
-    //   Metal::new(Vec3::new(0.8, 0.6, 0.2))
-    // ),
-    // Sphere::new(
-    //   Vec3::new(-1.0, 0.0, -1.0), 
-    //   0.5,
-    //   Metal::new(Vec3::new(0.8, 0.8, 0.8))
-    // )
   ));
 
   let camera = Camera::new();

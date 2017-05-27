@@ -4,11 +4,10 @@ use vec3::{dot, Vec3};
 use ray::Ray;
 use shape::HitRecord;
 
-pub trait Material : Copy { // TODO: it would be better to force borrowing on material in Shape - we don't really want to copy here...
-  fn scatter(&self, r_in: Ray, rec: &HitRecord<Self>) -> Option<(Vec3, Ray)>;
+pub trait Material{
+  fn scatter(&self, r_in: Ray, rec: &HitRecord) -> Option<(Vec3, Ray)>;
 }
 
-#[derive(Copy,Clone)]
 pub struct Lambertian {
   albedo: Vec3
 }
@@ -37,7 +36,7 @@ fn random_in_unit_sphere() -> Vec3 {
 }
 
 impl Material for Lambertian {
-  fn scatter(&self, r_in: Ray, rec: &HitRecord<Self>) -> Option<(Vec3, Ray)> {
+  fn scatter(&self, r_in: Ray, rec: &HitRecord) -> Option<(Vec3, Ray)> {
     let target = rec.point + rec.normal + random_in_unit_sphere();
     let scattered = Ray::new(rec.point, target - rec.point);
     let attunation = self.albedo;
@@ -50,7 +49,6 @@ fn reflect(v: Vec3, n: Vec3) -> Vec3 {
   v - 2.0 * dot(v, n) * n
 }
 
-#[derive(Copy,Clone)]
 pub struct Metal {
  albedo: Vec3
 }
@@ -64,7 +62,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-  fn scatter(&self, r_in: Ray, rec: &HitRecord<Self>) -> Option<(Vec3, Ray)> {
+  fn scatter(&self, r_in: Ray, rec: &HitRecord) -> Option<(Vec3, Ray)> {
     let reflected = reflect(r_in.direction().unit_vector(), rec.normal);
     let scattered = Ray::new(rec.point, reflected);
     let attunation = self.albedo;
