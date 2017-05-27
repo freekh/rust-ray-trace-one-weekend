@@ -69,27 +69,30 @@ fn main() {
   println!("P3\n{nx} {ny}\n255\n",
            nx = nx,
            ny = ny);
-
+  let m1 = &Lambertian::new(Vec3::new(0.8, 0.3, 0.3));
+  let m2 = &Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
+  let m3 = &Metal::new(Vec3::new(0.8, 0.6, 0.2));
+  let m4 = &Metal::new(Vec3::new(0.8, 0.8, 0.8));
   let world = Shapes(vec!(
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
       0.5,
-      Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3)))
+      m1
     ),
     Sphere::new(
       Vec3::new(0.0, -100.5, -1.0), 
       100.0,
-      Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)))
+      m2
     ),
     Sphere::new(
       Vec3::new(1.0, 0.0, -1.0), 
       0.5,
-      Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2)))
+      m3
     ),
     Sphere::new(
       Vec3::new(-1.0, 0.0, -1.0), 
       0.5,
-      Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8)))
+      m4
     )
   ));
 

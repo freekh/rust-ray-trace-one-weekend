@@ -2,25 +2,25 @@ use vec3::{Vec3, dot};
 use ray::Ray;
 use material::Material;
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
   pub t: f64,
   pub point: Vec3,
   pub normal: Vec3,
-  pub material: Box<Material>
+  pub material: &'a Material
 }
 
 pub trait Shape: Sized { // hitable sucks as name, shape is better...
   fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-pub struct Sphere {
+pub struct Sphere<'a> {
   center: Vec3,
   radius: f64,
-  material: Box<Material>
+  material: &'a Material
 }
 
-impl Sphere {
-  pub fn new(center: Vec3, radius: f64, material: Box<Material>) -> Sphere {
+impl<'a> Sphere<'a> {
+  pub fn new(center: Vec3, radius: f64, material: &'a Material) -> Sphere {
     Sphere {
       center: center,
       radius: radius,
@@ -29,7 +29,7 @@ impl Sphere {
   }
 }
 
-impl Shape for Sphere {
+impl<'a> Shape for Sphere<'a> {
   fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
     let oc = ray.origin() - self.center;
     let a = dot(ray.direction(), ray.direction());
