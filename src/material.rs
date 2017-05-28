@@ -116,13 +116,13 @@ impl Material for Dielectric {
     
     match refract(r_in.direction(), outward_normal, ni_over_t) {
       Some(refracted) => {
-        //let reflect_prob = schlick(cosine, self.ref_idx);
-        //let Closed01(rand) = random::<Closed01<f64>>();
-        //if rand < 1.0 && rand < reflect_prob {
-          //Some((attunation, Ray::new(rec.point, refracted)))
-        //} else {
+        let reflect_prob = schlick(cosine, self.ref_idx);
+        let Closed01(rand) = random::<Closed01<f64>>();
+        if rand < 1.0 && rand < reflect_prob {
           Some((attunation, Ray::new(rec.point, refracted)))
-        //}
+        } else {
+          Some((attunation, Ray::new(rec.point, refracted)))
+        }
       }
       None => {
         Some((attunation, Ray::new(rec.point, reflected)))

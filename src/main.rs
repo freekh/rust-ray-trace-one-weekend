@@ -60,8 +60,8 @@ fn color<S>(r: Ray, world: &Shapes<S>, depth: i32) -> Vec3 where S: Shape + Size
 fn main() {
   let start = Instant::now();
 
-  let nx = 200;
-  let ny = 100;
+  let nx = 400;
+  let ny = 200;
   let ns = env::args().nth(1).map(|a| a.parse::<i32>().unwrap()).unwrap_or(100);
   
   debug!("Piping ppm to stdout...\n");
@@ -71,7 +71,7 @@ fn main() {
            ny = ny);
 
   let camera = Camera::new(
-    Vec3::new(-2.0, 0.7, 1.5),
+    Vec3::new(-2.0, 1.25, 4.5),
     Vec3::new(0.0, 0.0, -1.0),
     Vec3::new(0.0, 1.0, 0.0),
     45.0,
@@ -79,7 +79,7 @@ fn main() {
   );
 
   let m1 = &Lambertian::new(Vec3::new(0.1, 0.2, 0.5));
-  let m2 = &Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
+  let m2 = &Lambertian::new(Vec3::new(0.8, 0.8, 0.2));
   let m3 = &Metal::new(Vec3::new(0.8, 0.6, 0.2));
   let m4 = &Dielectric::new(1.5);
 
