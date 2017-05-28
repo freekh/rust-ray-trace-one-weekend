@@ -4,6 +4,7 @@ use rand::{random, Closed01};
 use std::env;
 use std::f64;
 use std::time::Instant;
+use std::f64::consts;
 
 // 
 
@@ -68,10 +69,20 @@ fn main() {
   println!("P3\n{nx} {ny}\n255\n",
            nx = nx,
            ny = ny);
+
+  let camera = Camera::new(
+    Vec3::new(-2.0, 0.7, 1.5),
+    Vec3::new(0.0, 0.0, -1.0),
+    Vec3::new(0.0, 1.0, 0.0),
+    45.0,
+    nx as f64 / ny as f64
+  );
+
   let m1 = &Lambertian::new(Vec3::new(0.1, 0.2, 0.5));
   let m2 = &Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
   let m3 = &Metal::new(Vec3::new(0.8, 0.6, 0.2));
   let m4 = &Dielectric::new(1.5);
+
   let world = Shapes(vec!(
     Sphere::new(
       Vec3::new(0.0, 0.0, -1.0), 
@@ -100,7 +111,6 @@ fn main() {
     )
   ));
 
-  let camera = Camera::new();
 
   for y in (0..ny).rev() {
     for x in 0..nx {
