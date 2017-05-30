@@ -8,3 +8,5 @@ a
 
 On a linux box with feh installed you can test it like this: `cargo run 100  > test.ppm && feh --zoom fill  test.ppm`
 
+# Example image
+![Example image](https://github.com/freekh/rust-ray-trace-one-weekend/raw/master/image.png)
