@@ -1,6 +1,6 @@
 # What this is
 
-This is the code for the book ray tracing in one weekend with some minor changes ported to Rust (not C++).
+This code is a Rust raytracer inspired by the book ray tracing in one weekend.
 
 Essentially it is a basic ray tracer capable of rendering simple spheres in 3 different materials: lambertian, metal and dielectric (glass).
 
