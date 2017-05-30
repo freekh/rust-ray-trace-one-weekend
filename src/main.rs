@@ -70,23 +70,16 @@ fn main() {
            nx = nx,
            ny = ny);
 
-  let lookfrom = Vec3::new(3.0, 3.0, 2.0);
-  let lookat = Vec3::new(0.0, 0.0, -1.0);
-  
-  let dist_to_focus = (lookfrom - lookat).length();
-
   let camera = Camera::new(
-    lookfrom,
-    lookat,
+    Vec3::new(-2.0, 1.25, 4.5),
+    Vec3::new(0.0, 0.0, -1.0),
     Vec3::new(0.0, 1.0, 0.0),
-    20.0,
-    nx as f64 / ny as f64,
-    1.0,
-    dist_to_focus
+    45.0,
+    nx as f64 / ny as f64
   );
 
   let m1 = &Lambertian::new(Vec3::new(0.1, 0.2, 0.5));
-  let m2 = &Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
+  let m2 = &Lambertian::new(Vec3::new(0.8, 0.8, 0.2));
   let m3 = &Metal::new(Vec3::new(0.8, 0.6, 0.2));
   let m4 = &Dielectric::new(1.5);
 
